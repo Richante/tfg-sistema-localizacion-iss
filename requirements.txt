@@ -1,0 +1,6 @@
+pandas
+skyfield
+requests
+
+Para garantizar la reproducibilidad del experimento, se ha creado un archivo de requisitos que gestiona las dependencias del proyecto. Se ha seleccionado la librería Skyfield debido a su alta precisión astronómica y por seguir los estándares del United States Naval Observatory (USNO).
+Fuente: Skyfield Documentation
