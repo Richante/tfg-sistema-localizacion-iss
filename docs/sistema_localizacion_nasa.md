@@ -75,6 +75,9 @@ Environmental Data App: Visualización de parámetros ambientales internos y ext
 https://visualization.osdr.nasa.gov/
 
 HDEV Experimento NASA: Streaming de video en directo desde cámaras externas montadas en la ISS, útil para observaciones y validación de datos.
+
+Tras el análisis de los recursos de la NASA, se identifica que el formato estándar para la interoperabilidad de datos orbitales es el TLE (Two-Line Element). Para la adquisición automatizada de estos datos en este proyecto, se utilizará el repositorio CelesTrak, que actúa como espejo oficial de los datos de seguimiento del NORAD/NASA.
+
 https://eol.jsc.nasa.gov/
 
 ## Por qué investigar la web de la NASA
