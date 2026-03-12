@@ -6,5 +6,8 @@
 | Feb     | 3      | Adquisición automatizada de datos      | Script de descarga TLE desde CelesTrak    | [REALIZADO] | 3h                  | Notebook 01: Conexión con servidor NORAD |
 | Feb     | 3      | Implementación de Propagador SGP4      | Conversión de TLE a Latitud/Longitud      | [REALIZADO] | 4h                  | Validación de coordenadas con Skyfield |
 | Feb     | 3      | Generación de Dataset y Visualización  | Crear histórico CSV y mapa de trayectoria | [REALIZADO] | 3h                  | Exportación a /data y gráfica en /results |
-| Feb     | 4      | Ingeniería Inversa: Teoría SGP4        | Documentar variables físicas (Drag/Incl)  | [EN PROCESO]| 2h                  | Creación de docs/teoria_sistema... |
-| Mar     | 1-2    | Preparación de datos para IA           | Normalización y limpieza del dataset CSV  | [ ]         |                     | Fase previa al entrenamiento del modelo |
+| Feb     | 4      | Ingeniería Inversa: Teoría SGP4        | Análisis de variables (Drag/BSTAR/Incl)   | [REALIZADO] | 7h                  | Desviación: Estudio técnico del rozamiento |
+| Mar     | 1      | Definición de Marco Metodológico       | Aplicar ITIL y Modelo en Espiral          | [REALIZADO] | 4h                  | Formalización en docs/metodologia.md |
+| Mar     | 2      | Gestión de Configuración y TDD         | Scripts de entorno y tests unitarios      | [EN PROCESO]| 3h                  | Validando portabilidad (Ubuntu/Rocky) |
+| Mar     | 3-4    | Análisis estadístico y Prep. IA        | Limpieza en RStudio y normalización       | [ ]         | -                   | Reubicado tras ajuste de arquitectura |
+| Abr     | 1-2    | Arquitectura Web y Despliegue          | Interfaz JSON y servidor Linux            | [ ]         | -                   | Integración de motor visual 3D |
