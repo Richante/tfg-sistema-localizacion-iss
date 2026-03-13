@@ -29,3 +29,21 @@ def comparar():
     modelo_1.fit(X_train, y_train)
     pred_1 = modelo_1.predict(X_test)
     error_1 = mean_absolute_error(y_test, pred_1)
+
+    # MODELO 2: Random Forest
+    modelo_2 = RandomForestRegressor(n_estimators=100)
+    modelo_2.fit(X_train, y_train)
+    pred_2 = modelo_2.predict(X_test)
+    error_2 = mean_absolute_error(y_test, pred_2)
+
+    print(f"--- RESULTADOS DEL DUELO ---")
+    print(f"Error Regresión Lineal: {error_1:.6f}")
+    print(f"Error Random Forest:    {error_2:.6f}")
+    
+    if error_2 < error_1:
+        print("\nGanador: Random Forest. Es más preciso para seguir la ISS.")
+    else:
+        print("\nGanador: Regresión Lineal. Los datos son más simples de lo que pensaba.")
+
+if __name__ == "__main__":
+    comparar()
