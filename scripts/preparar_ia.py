@@ -29,7 +29,7 @@ def preparar_datos():
     df_final = pd.DataFrame(datos_escalados, columns=['lat', 'lon', 'alt'])
     df_final.to_csv(ruta_salida, index=False)
     
-    print("✅ Datos normalizados y listos en data/dataset_ia_listo.csv")
+    print("Datos normalizados y listos en data/dataset_ia_listo.csv")
     print("He usado MinMaxScaler para que todos los valores estén entre 0 y 1.")
 
 if __name__ == "__main__":
