@@ -34,3 +34,14 @@ def preparar_datos():
 
 if __name__ == "__main__":
     preparar_datos()
+
+    #1. He visto que la Regresión Lineal falla bastante (0.014) porque intenta trazar 
+#líneas rectas, y como la ISS se mueve en órbitas (curvas), no puede seguirla bien.
+
+#2. El Random Forest ha ganado por paliza (0.0009). Al usar árboles de decisión, 
+#mi IA ha sido capaz de "entender" los ciclos de 90 minutos de la ISS y se adapta 
+#mucho mejor a las curvas de la trayectoria.
+
+#3. Con este error tan bajo, he demostrado que el Random Forest es el modelo 
+#ideal para mi proyecto. Ahora puedo dejar de comparar y centrarme en usar 
+#este "cerebro" para corregir las predicciones de la NASA.

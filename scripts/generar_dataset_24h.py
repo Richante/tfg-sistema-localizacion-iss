@@ -32,7 +32,7 @@ def ejecutar_generacion():
     ts = load.timescale()
     satelite = EarthSatellite(linea1, linea2, nombre, ts)
     
-    # Me guardo el BSTAR porque el profe dijo que era importante para el rozamiento
+    # Me guardo el BSTAR porque era importante para el rozamiento
     bstar = satelite.model.bstar 
 
     print(f"Empezando a calcular puntos para: {nombre}...")
