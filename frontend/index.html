@@ -3,17 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ISS Tracker - TFG</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>ISS Tracker IA - TFG</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Sistema Inteligente de Localización - ISS</h1>
-        <p>Trayectoria orbital de 24 horas (Ground Truth de la NASA)</p>
+    <header class="topbar">
+        <div>
+            <h1>Sistema inteligente de localización de la ISS</h1>
+            <p>Comparación entre NASA OEM, SGP4 y corrección mediante IA</p>
+        </div>
+        <div id="estadoApi" class="status">Conectando con AWS...</div>
     </header>
-    
-    <div id="mapa"></div>
+
+    <main class="layout">
+        <section class="map-section">
+            <div class="section-title">
+                <h2>Trayectoria terrestre</h2>
+                <p>Ground track calculado sobre latitud y longitud.</p>
+            </div>
+            <div id="mapa"></div>
+        </section>
+
+        <aside class="panel">
+            <section>
+                <h2>Resultado del experimento</h2>
+                <p class="explain">
+                    La IA aprende el residuo entre la predicción SGP4 y la referencia oficial NASA OEM.
+                </p>
+            </section>
+
+            <section class="metric-group">
+                <h3>Predicción futura</h3>
+                <div class="metrics">
+                    <div class="metric">
+                        <span>SGP4</span>
+                        <strong id="temporalSgp4">-- km</strong>
+                    </div>
+                    <div class="metric">
+                        <span>SGP4 + IA</span>
+                        <strong id="temporalIa">-- km</strong>
+                    </div>
+                </div>
+                <p id="temporalTexto" class="conclusion">Esperando resultados...</p>
+            </section>
+
+            <section class="metric-group highlight">
+                <h3>Calibración con NASA OEM</h3>
+                <div class="metrics">
+                    <div class="metric">
+                        <span>SGP4</span>
+                        <strong id="calibracionSgp4">-- km</strong>
+                    </div>
+                    <div class="metric">
+                        <span>SGP4 + IA</span>
+                        <strong id="calibracionIa">-- km</strong>
+                    </div>
+                </div>
+                <div class="improvement">
+                    <span>Mejora obtenida</span>
+                    <strong id="mejoraIa">-- %</strong>
+                </div>
+                <p id="calibracionTexto" class="conclusion">Esperando resultados...</p>
+            </section>
+        </aside>
+
+        <section class="orbit-section">
+            <div class="section-title">
+                <h2>Comparación orbital</h2>
+                <p>Proyección X/Y de los vectores NASA OEM, SGP4 y SGP4 + IA.</p>
+            </div>
+            <canvas id="orbitaCanvas" width="1000" height="340"></canvas>
+            <div class="legend">
+                <span><i class="oem"></i> NASA OEM</span>
+                <span><i class="sgp4"></i> SGP4</span>
+                <span><i class="ia"></i> SGP4 + IA</span>
+            </div>
+            <div class="section-title compact">
+                <h2>Evolución del error</h2>
+                <p>Distancia 3D respecto a NASA OEM en la validación de calibración.</p>
+            </div>
+            <canvas id="errorCanvas" width="1000" height="220"></canvas>
+            <div class="legend">
+                <span><i class="sgp4"></i> Error SGP4</span>
+                <span><i class="ia"></i> Error SGP4 + IA</span>
+            </div>
+        </section>
+    </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
