@@ -191,6 +191,13 @@ cython_debug/
 # Ruff stuff:
 .ruff_cache/
 
+# Archivos generados por la validacion SGP4 vs NASA OEM
+data/iss_tle_actual.txt
+data/ISS.OEM_J2K_EPH.txt
+data/comparacion_sgp4_oem.csv
+models/modelo_corrector_sgp4_oem.joblib
+results/evaluacion_corrector_ia.csv
+
 # PyPI configuration file
 .pypirc
 

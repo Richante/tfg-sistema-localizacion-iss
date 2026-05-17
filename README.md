@@ -34,3 +34,18 @@ graph TD
     classDef datos fill:#f5f5f5,stroke:#666666,stroke-width:2px;
     classDef ia fill:#e1d5e7,stroke:#9673a6,stroke-width:2px;
     classDef valor fill:#d5e8d4,stroke:#82b366,stroke-width:4px;
+```
+
+## Validacion SGP4 vs IA
+
+La fase nueva del proyecto compara una prediccion SGP4 basada en TLE contra la
+efemeride OEM oficial de NASA Spot the Station. La IA se usa como corrector del
+residuo entre ambas trayectorias.
+
+Flujo principal:
+
+```bash
+python scripts/ejecutar_validacion_oem.py
+```
+
+Documentacion: `docs/validacion_sgp4_vs_ia.md`
