@@ -1,12 +1,11 @@
-# Script para ver si el CSV que acabo de crear está bien o si ha salido basura
-# Esto es lo que llaman TDD, para no meterle datos malos a la IA
+# Test para comprobar que el CSV de 24 horas se ha generado bien.
+# Asi evito entrenar la IA con datos incompletos o fuera de rango.
 
 import pandas as pd
 import os
 
 def test_calidad_datos():
-    # Primero ver si el archivo se ha creado de verdad
-    # Uso la ruta relativa desde la raíz del proyecto
+    # Compruebo que el archivo existe en la ruta esperada.
     ruta = "data/dataset_iss_24h.csv"
     
     print(f"Comprobando archivo: {ruta}")
@@ -14,18 +13,18 @@ def test_calidad_datos():
     
     df = pd.read_csv(ruta)
     
-    # Chequear que tenga las 1440 filas (las 24 horas)
+    # Debe tener 1440 filas: una por cada minuto del dia.
     assert len(df) == 1440, f"faltan datos. Hay {len(df)} filas."
     
-    # Ver si las coordenadas tienen sentido (que no se salgan del mapa)
+    # Compruebo que las coordenadas no se salen del rango del mapa.
     assert df['latitud'].between(-90, 90).all(), "Hay una latitud rara fuera de rango."
-    assert df['longitud'].between(-180, 180).all(), "La longitud se ha ido de madre."
+    assert df['longitud'].between(-180, 180).all(), "Hay una longitud fuera de rango."
     
-    # Mirar si hay algún hueco vacío (NaN) que luego fastidie la IA
-    assert not df.isnull().values.any(), "Hay valores nulos por ahí mezclados."
+    # Miro que no haya huecos vacios que luego afecten al entrenamiento.
+    assert not df.isnull().values.any(), "Hay valores nulos en el dataset."
     
     print("Todo parece correcto, Los datos están limpios y listos.")
 
 if __name__ == "__main__":
-    # Llamo a la función correcta para que no de el error de 'not defined'
+    # Permite ejecutar este archivo directamente si necesito probarlo a mano.
     test_calidad_datos()

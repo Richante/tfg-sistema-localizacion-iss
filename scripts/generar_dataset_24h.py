@@ -1,5 +1,5 @@
-# Script para sacar un montón de datos de la ISS y no solo una hora
-# Lo hago para tener un CSV grande y que la IA tenga de donde aprender
+# Script para generar un dataset de 24 horas de la ISS.
+# Lo uso para tener mas puntos de trayectoria con los que entrenar la IA.
 
 import pandas as pd
 from datetime import datetime, timedelta
@@ -7,21 +7,21 @@ from skyfield.api import load, EarthSatellite
 import os
 
 def ejecutar_generacion():
-    # Busco las rutas de los archivos para no liarme con las carpetas
+    # Preparo las rutas de entrada y salida.
     base_dir = os.path.dirname(os.path.abspath(__file__))
     ruta_tle = os.path.join(base_dir, '../data/iss_tle.txt')
     ruta_salida = os.path.join(base_dir, '../data/dataset_iss_24h.csv')
 
-    # Creo la carpeta data si no existe, por si acaso
+    # Creo la carpeta data si todavia no existe.
     if not os.path.exists(os.path.join(base_dir, '../data')):
         os.makedirs(os.path.join(base_dir, '../data'))
 
-    # Miro si el TLE de la NASA está ahí
+    # Compruebo que el TLE base este disponible.
     if not os.path.exists(ruta_tle):
-        print("Oye, falta el iss_tle.txt en la carpeta data. Descárgalo primero!")
+        print("Falta iss_tle.txt en la carpeta data. Descargalo primero.")
         return
 
-    # Leo las líneas del TLE para pasárselas al motor de Skyfield
+    # Leo las lineas del TLE para pasarlas a Skyfield.
     with open(ruta_tle, 'r') as f:
         lineas = f.readlines()
     
@@ -32,20 +32,20 @@ def ejecutar_generacion():
     ts = load.timescale()
     satelite = EarthSatellite(linea1, linea2, nombre, ts)
     
-    # Me guardo el BSTAR porque era importante para el rozamiento
+    # Guardo BSTAR porque esta relacionado con el rozamiento atmosferico.
     bstar = satelite.model.bstar 
 
     print(f"Empezando a calcular puntos para: {nombre}...")
     datos = []
     ahora = datetime.utcnow()
 
-    # Voy a sacar 1440 puntos (uno por cada minuto de un día entero)
+    # Genero 1440 puntos, uno por cada minuto de un dia.
     for i in range(1440):
         momento_utc = ahora - timedelta(minutes=i)
         t = ts.utc(momento_utc.year, momento_utc.month, momento_utc.day, 
                    momento_utc.hour, momento_utc.minute, momento_utc.second)
         
-        # Calculo la posición usando SGP4
+        # Calculo la posicion usando SGP4 mediante Skyfield.
         geocentrico = satelite.at(t)
         subpunto = geocentrico.subpoint()
 
@@ -57,7 +57,7 @@ def ejecutar_generacion():
             "bstar_nasa": bstar
         })
 
-    # Lo paso a un DataFrame y lo guardo
+    # Paso la lista a DataFrame y la guardo en CSV.
     df = pd.DataFrame(datos)
     df.to_csv(ruta_salida, index=False)
     print(f"Listo! He guardado {len(df)} filas en el CSV nuevo.")

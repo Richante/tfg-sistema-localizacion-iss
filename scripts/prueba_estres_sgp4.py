@@ -18,7 +18,7 @@ def ejecutar_prueba_estres():
     ia_modelo = RandomForestRegressor(n_estimators=50, random_state=42)
     ia_modelo.fit(X_train, y_train)
 
-    # LÍNEA CORREGIDA: Forzamos la creación de un array de NumPy independiente y escribible
+    # Creo una copia modificable de la altitud para simular una anomalia.
     realidad_altitud = np.array(df['alt'].iloc[:800].copy())
     
     punto_anomalia = 500

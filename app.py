@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 
 app = Flask(__name__)
-# CORS permite que la web subida a S3 pueda llamar a esta API en EC2.
+# Lo activo para que el frontend de S3 pueda pedir datos a esta API.
 CORS(app)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -89,7 +89,7 @@ def obtener_trayectorias_comparadas():
 
     df = pd.read_csv(ruta_calibracion)
 
-    # Envio una muestra para que el navegador cargue rapido.
+    # No mando todos los puntos para que la web cargue sin tardar demasiado.
     paso = max(1, len(df) // 400)
     df = df.iloc[::paso].copy()
 
@@ -127,5 +127,5 @@ def obtener_estado():
 
 
 if __name__ == "__main__":
-    # Uso el puerto 80 porque es el puerto HTTP normal en AWS.
+    # En AWS uso el puerto 80 para abrir la API como una web normal.
     app.run(host="0.0.0.0", port=80)

@@ -1,11 +1,5 @@
-"""Compara la propagacion SGP4/TLE contra la efemeride OEM de NASA.
-
-El resultado es un dataset de evaluacion con:
-- vector de posicion OEM publicado por NASA
-- vector de posicion calculado con SGP4 para los mismos timestamps
-- residuo OEM - SGP4
-- error euclideo en kilometros
-"""
+# Script para comparar lo que calcula SGP4 con la referencia OEM de NASA.
+# Guardo las posiciones de ambos metodos y el error en kilometros para entrenar la IA.
 
 from __future__ import annotations
 
@@ -23,7 +17,7 @@ RUTA_SALIDA = Path("data/comparacion_sgp4_oem.csv")
 
 
 def _parsear_fecha_oem(valor: str) -> datetime:
-    """Acepta fechas CCSDS habituales: calendario o dia-del-ano."""
+    # NASA puede publicar la fecha en formato calendario o con dia del anio.
     limpio = valor.strip().replace("Z", "")
     formatos = (
         "%Y-%m-%dT%H:%M:%S.%f",

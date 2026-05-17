@@ -1,5 +1,5 @@
-# Este script lo he creado para asegurar que el entorno de desarrollo
-# sea consistente, especialmente pensando en el futuro despliegue en Ubuntu Server.
+# Script para comprobar que el entorno tiene las librerias necesarias.
+# Me sirve sobre todo antes de ejecutar el proyecto en Ubuntu o en AWS.
 
 import sys
 import platform
@@ -11,7 +11,7 @@ def verificar_entorno():
     print(f"Sistema Operativo: {platform.system()} {platform.release()}")
     print(f"Versión de Python: {sys.version}")
     
-    # Compruebo las librerías críticas para mi TFG
+    # Compruebo las librerias principales que usa el proyecto.
     librerias = [("Pandas", pd), ("Skyfield", skyfield)]
     
     for nombre, lib in librerias:

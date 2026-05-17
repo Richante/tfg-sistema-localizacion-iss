@@ -1,5 +1,5 @@
-# Script para entrenar al modelo ganador (Random Forest) con TODOS los datos
-# y guardarlo en un archivo. Así no tengo que entrenarlo cada vez que lo use.
+# Script para entrenar el modelo Random Forest con todos los datos disponibles.
+# Lo guardo en un archivo para poder reutilizarlo sin entrenarlo cada vez.
 
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
@@ -10,7 +10,7 @@ def guardar_modelo_definitivo():
     ruta_datos = "data/dataset_ia_listo.csv"
     ruta_modelo = "models/modelo_iss.joblib"
     
-    # 1. Por si acaso no existe la carpeta 'models', la creo automáticamente
+    # Creo la carpeta de modelos si todavia no existe.
     os.makedirs("models", exist_ok=True)
     
     if not os.path.exists(ruta_datos):
@@ -19,27 +19,24 @@ def guardar_modelo_definitivo():
 
     df = pd.read_csv(ruta_datos)
 
-    # 2. Preparo el entrenamiento:
-    # X = Dónde está la ISS ahora (todo menos el último minuto)
-    # y = Dónde estará en el siguiente minuto (todo menos el primer minuto)
+    # X representa el estado actual de la ISS.
+    # y representa el estado del minuto siguiente.
     X = df[['lat', 'lon', 'alt']].iloc[:-1]
     y = df[['lat', 'lon', 'alt']].iloc[1:]
 
-    # 3. Entreno con TODOS los datos (ya no separo para testear porque ya sé que funciona)
-    print("Entrenando el cerebro definitivo (Random Forest)....")
+    # Entreno el modelo final con todos los datos ya preparados.
+    print("Entrenando el modelo final (Random Forest)....")
     modelo_final = RandomForestRegressor(n_estimators=100, random_state=42)
     modelo_final.fit(X, y)
 
-    # 4. Congelo el cerebro y lo guardo en un archivo
+    # Guardo el modelo entrenado en un archivo .joblib.
     joblib.dump(modelo_final, ruta_modelo)
     
     print(f"El modelo está guardado y listo para usarse en: {ruta_modelo}")
 
     
-    #Uso 'joblib' porque es el estándar en Python para serializar (guardar) 
-    #modelos de Scikit-Learn. Ahora mi web o mi sistema predictivo solo 
-    # tiene que cargar este archivo .joblib y hacer la predicción al instante, 
-    # sin gastar CPU en reentrenar.
+    # Uso joblib porque es una forma habitual de guardar modelos de Scikit-Learn.
+    # Asi la aplicacion solo tiene que cargar el archivo y hacer la prediccion.
 
 if __name__ == "__main__":
     guardar_modelo_definitivo()

@@ -1,6 +1,5 @@
-# Script para la Gran Comparación Final (NASA vs IA)
-# Aquí demostramos que nuestro modelo guardado realmente funciona
-# y mejora la predicción de la trayectoria.
+# Script para hacer una evaluacion final sencilla del modelo guardado.
+# Comparo la prediccion de la IA con los datos que ya tenia preparados.
 
 import pandas as pd
 import joblib
@@ -12,25 +11,25 @@ def evaluar_sistema():
     ruta_modelo = "models/modelo_iss.joblib"
 
     if not os.path.exists(ruta_modelo):
-        print("Error: No encuentro el cerebro de la IA (.joblib).")
+        print("Error: No encuentro el modelo de la IA (.joblib).")
         return
 
-    # 1. Cargamos el cerebro y los datos
+    # Cargo el modelo guardado y los datos preparados.
     modelo_ia = joblib.load(ruta_modelo)
     df = pd.read_csv(ruta_datos)
 
-    # 2. Cojo los últimos 100 minutos (simulando que es el futuro que la IA no conoce bien)
+    # Uso los ultimos 100 puntos como una prueba simple.
     datos_prueba = df.tail(100)
     
-    # Lo que sabemos (el estado actual)
+    # Lo que sabemos: el estado actual.
     X_prueba = datos_prueba[['lat', 'lon', 'alt']].iloc[:-1]
-    # Lo que queremos adivinar (el siguiente minuto real)
+    # Lo que queremos estimar: el siguiente minuto real.
     y_real = datos_prueba[['lat', 'lon', 'alt']].iloc[1:]
 
-    # 3. Ponemos a la IA a trabajar
+    # La IA calcula su prediccion.
     prediccion_ia = modelo_ia.predict(X_prueba)
 
-    # 4. Calculamos cuánto se ha equivocado nuestra IA vs la Realidad
+    # Calculo el error medio de la IA en cada coordenada.
     error_ia_lat = mean_absolute_error(y_real['lat'], prediccion_ia[:, 0])
     error_ia_lon = mean_absolute_error(y_real['lon'], prediccion_ia[:, 1])
     error_ia_alt = mean_absolute_error(y_real['alt'], prediccion_ia[:, 2])
@@ -41,10 +40,10 @@ def evaluar_sistema():
     print(f"Longitud: {error_ia_lon:.6f}")
     print(f"Altitud:  {error_ia_alt:.6f}")
     
-    print("\nConclusión para el TFG:")
-    print("Los errores cercanos a 0.000 demuestran que el sistema inteligente")
-    print("es capaz de seguir la estela de la ISS casi a la perfección,")
-    print("validando el uso de Random Forest en la arquitectura del sistema.")
+    print("\nConclusion para el TFG:")
+    print("Los errores bajos indican que Random Forest puede seguir bien")
+    print("la trayectoria cuando se entrena con datos ya preparados.")
+    print("Esta prueba sirve como apoyo antes de la validacion con NASA OEM.")
 
 if __name__ == "__main__":
     evaluar_sistema()

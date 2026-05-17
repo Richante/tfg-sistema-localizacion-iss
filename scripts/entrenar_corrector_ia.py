@@ -1,11 +1,6 @@
-"""Entrena una IA correctora del error residual SGP4 -> NASA OEM.
-
-La IA no sustituye a SGP4. Aprende el residuo entre la posicion publicada en
-la efemeride OEM de NASA y la posicion calculada con SGP4 para el mismo
-timestamp. La prediccion final es:
-
-    posicion_corregida = posicion_sgp4 + residuo_predicho_por_ia
-"""
+# Script para probar si la IA puede corregir parte del error que deja SGP4.
+# La idea no es sustituir SGP4, sino aprender la diferencia entre SGP4 y NASA OEM.
+# Luego sumo esa correccion a la posicion calculada con SGP4.
 
 from __future__ import annotations
 
@@ -49,8 +44,7 @@ def preparar_variables(df: pd.DataFrame) -> pd.DataFrame:
     df["fecha_hora"] = pd.to_datetime(df["fecha_hora"], utc=True)
     df["tiempo_min"] = (df["fecha_hora"] - df["fecha_hora"].min()).dt.total_seconds() / 60
 
-    # La ISS tarda unos 93 minutos en dar una vuelta. Estas variables ayudan
-    # a la IA a reconocer patrones que se repiten en cada orbita.
+    # Meto seno y coseno para que la IA vea que la orbita se repite cada vuelta.
     periodo_orbital_min = 92.95
     angulo = 2 * np.pi * df["tiempo_min"] / periodo_orbital_min
     df["orbita_sin"] = np.sin(angulo)
@@ -132,7 +126,7 @@ def entrenar_corrector(
     df = preparar_variables(pd.read_csv(ruta_comparacion))
     corte = int(len(df) * 0.75)
 
-    # Modo 1: prueba estricta. Entreno con el primer 75% y pruebo con el futuro.
+    # Primera prueba: entreno con el principio y compruebo si acierta el futuro.
     prueba_temporal = evaluar_modelo(
         df,
         df.index[:corte],
@@ -140,8 +134,7 @@ def entrenar_corrector(
         "Validacion temporal: prediccion de tramo futuro",
     )
 
-    # Modo 2: calibracion. Uso puntos repartidos por toda la ventana OEM.
-    # Esto prueba si la IA aprende el patron del error de SGP4 dentro del periodo.
+    # Segunda prueba: mezclo puntos para ver si aprende a calibrar ese mismo periodo.
     indices = np.arange(len(df))
     train_idx = df.index[indices % 4 != 0]
     test_idx = df.index[indices % 4 == 0]

@@ -1,4 +1,4 @@
-"""Descarga el TLE actual de la ISS desde CelesTrak."""
+# Script para descargar el TLE actual de la ISS desde CelesTrak.
 
 from pathlib import Path
 

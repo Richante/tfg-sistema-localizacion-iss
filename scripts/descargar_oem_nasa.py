@@ -1,9 +1,5 @@
-"""Descarga la efemeride OEM oficial de la ISS publicada por NASA.
-
-El archivo OEM de Spot the Station se usa como referencia externa para
-comparar la prediccion SGP4 basada en TLE con una trayectoria operacional
-publicada por NASA/JSC.
-"""
+# Script para descargar el archivo OEM de NASA.
+# Lo uso como referencia externa para comparar SGP4 con datos oficiales.
 
 from pathlib import Path
 

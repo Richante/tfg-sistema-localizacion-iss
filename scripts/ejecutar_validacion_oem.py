@@ -1,4 +1,4 @@
-"""Ejecuta la validacion completa SGP4 vs NASA OEM."""
+# Script principal para lanzar toda la validacion SGP4 vs NASA OEM.
 
 from comparar_sgp4_oem import comparar_sgp4_oem
 from descargar_oem_nasa import descargar_oem

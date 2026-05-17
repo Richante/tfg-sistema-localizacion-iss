@@ -1,5 +1,5 @@
-# Script para ver qué IA es mejor: Regresión simple vs Random Forest
-# Así tengo pruebas de por qué elegí una y no otra
+# Script para comparar dos modelos sencillos de IA.
+# Asi puedo justificar por que uso Random Forest en esta parte del proyecto.
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -11,26 +11,25 @@ import os
 def comparar():
     ruta = "data/dataset_ia_listo.csv"
     if not os.path.exists(ruta):
-        print("Falta el archivo listo para IA. ¡Corre el script de preparar_ia primero!")
+        print("Falta el archivo listo para IA. Ejecuta primero scripts/preparar_ia.py")
         return
 
     df = pd.read_csv(ruta)
 
-    # Queremos predecir la LATITUD basándonos en los puntos anteriores
-    # Para hacerlo simple hoy: usamos una fila para predecir la siguiente
+    # Uso un punto de la trayectoria para intentar predecir la latitud del siguiente.
     X = df[['lat', 'lon', 'alt']].iloc[:-1] # Todos menos el último
     y = df['lat'].iloc[1:]                 # Todos menos el primero (el objetivo)
 
-    # Divido en 80% para aprender y 20% para examen (test)
+    # Divido los datos en entrenamiento y prueba.
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # MODELO 1: Regresión Lineal
+    # Modelo 1: Regresion Lineal.
     modelo_1 = LinearRegression()
     modelo_1.fit(X_train, y_train)
     pred_1 = modelo_1.predict(X_test)
     error_1 = mean_absolute_error(y_test, pred_1)
 
-    # MODELO 2: Random Forest
+    # Modelo 2: Random Forest.
     modelo_2 = RandomForestRegressor(n_estimators=100)
     modelo_2.fit(X_train, y_train)
     pred_2 = modelo_2.predict(X_test)
