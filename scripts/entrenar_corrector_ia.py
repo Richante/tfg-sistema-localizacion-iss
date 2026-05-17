@@ -117,8 +117,17 @@ def entrenar_corrector(
     print(f"MAE SGP4 + IA: {mae_ia:.3f} km")
     print(f"RMSE SGP4:      {rmse_sgp4:.3f} km")
     print(f"RMSE SGP4 + IA: {rmse_ia:.3f} km")
-    print(f"Error 3D medio SGP4:      {prueba['error_sgp4_km'].mean():.3f} km")
-    print(f"Error 3D medio SGP4 + IA: {prueba['error_ia_km'].mean():.3f} km")
+    error_3d_sgp4 = prueba["error_sgp4_km"].mean()
+    error_3d_ia = prueba["error_ia_km"].mean()
+
+    print(f"Error 3D medio SGP4:      {error_3d_sgp4:.3f} km")
+    print(f"Error 3D medio SGP4 + IA: {error_3d_ia:.3f} km")
+
+    if error_3d_ia < error_3d_sgp4:
+        print("Conclusion: en este experimento la IA reduce el error de SGP4.")
+    else:
+        print("Conclusion: en este experimento la IA no mejora a SGP4.")
+        print("Esto indica que hacen falta mas datos o variables externas para corregir mejor.")
     return prueba
 
 

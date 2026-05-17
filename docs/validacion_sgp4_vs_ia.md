@@ -87,6 +87,9 @@ Error SGP4 + IA vs NASA OEM
 
 Si el segundo error es menor en el tramo de prueba, se puede defender que el
 sistema inteligente mejora la estimacion base de SGP4 para ese experimento.
+Si no mejora, el resultado tambien es util: demuestra que SGP4 ya es una base
+muy fuerte y que la IA necesita mas datos historicos o variables externas para
+aportar una correccion real.
 
 ## Fuentes
 

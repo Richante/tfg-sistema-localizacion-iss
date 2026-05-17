@@ -82,7 +82,11 @@ def cargar_satelite_desde_tle(ruta_tle: Path = RUTA_TLE) -> EarthSatellite:
     if not ruta_tle.exists():
         raise FileNotFoundError(f"No existe {ruta_tle}")
 
-    lineas = [linea.strip() for linea in ruta_tle.read_text(encoding="utf-8").splitlines()]
+    lineas = [
+        linea.strip()
+        for linea in ruta_tle.read_text(encoding="utf-8").splitlines()
+        if linea.strip()
+    ]
 
     for indice in range(len(lineas) - 2):
         nombre, linea1, linea2 = lineas[indice : indice + 3]
@@ -94,7 +98,7 @@ def cargar_satelite_desde_tle(ruta_tle: Path = RUTA_TLE) -> EarthSatellite:
 
 
 def propagar_sgp4(timestamps: pd.Series, satelite: EarthSatellite) -> pd.DataFrame:
-    ts = satelite.ts
+    ts = load.timescale()
     posiciones = []
 
     for fecha in timestamps:
