@@ -197,6 +197,8 @@ data/ISS.OEM_J2K_EPH.txt
 data/comparacion_sgp4_oem.csv
 models/modelo_corrector_sgp4_oem.joblib
 results/evaluacion_corrector_ia.csv
+results/evaluacion_corrector_ia_temporal.csv
+results/evaluacion_corrector_ia_calibracion.csv
 
 # PyPI configuration file
 .pypirc

@@ -72,7 +72,8 @@ data/iss_tle_actual.txt
 data/ISS.OEM_J2K_EPH.txt
 data/comparacion_sgp4_oem.csv
 models/modelo_corrector_sgp4_oem.joblib
-results/evaluacion_corrector_ia.csv
+results/evaluacion_corrector_ia_temporal.csv
+results/evaluacion_corrector_ia_calibracion.csv
 ```
 
 Estos archivos se consideran resultados generados y no se suben al repositorio
@@ -85,11 +86,28 @@ Error SGP4 vs NASA OEM
 Error SGP4 + IA vs NASA OEM
 ```
 
-Si el segundo error es menor en el tramo de prueba, se puede defender que el
-sistema inteligente mejora la estimacion base de SGP4 para ese experimento.
-Si no mejora, el resultado tambien es util: demuestra que SGP4 ya es una base
-muy fuerte y que la IA necesita mas datos historicos o variables externas para
-aportar una correccion real.
+El script muestra dos modos:
+
+```text
+Validacion temporal
+```
+
+Entrena con el primer 75% de la ventana OEM y prueba con el tramo futuro. Es la
+prueba mas exigente porque evalua capacidad de prediccion futura.
+
+```text
+Validacion intercalada
+```
+
+Entrena con puntos repartidos por toda la ventana OEM y prueba con puntos no
+vistos intercalados. Esta prueba mide si la IA puede actuar como calibrador del
+error SGP4 dentro de una ventana orbital conocida.
+
+Si la IA mejora en el modo intercalado, se puede defender que el sistema aprende
+una correccion util cuando dispone de datos oficiales recientes. Si no mejora en
+el modo temporal, el resultado tambien es util: demuestra que SGP4 ya es una
+base muy fuerte y que para predecir mejor el futuro hacen falta mas datos
+historicos o variables externas.
 
 ## Fuentes
 
