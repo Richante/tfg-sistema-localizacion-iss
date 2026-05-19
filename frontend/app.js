@@ -1,5 +1,5 @@
 const parametros = new URLSearchParams(window.location.search);
-const API_URL = parametros.get("api") || "http://13.217.22.163";
+const API_URL = parametros.get("api") || "http://98.91.248.90";
 
 const estadoApi = document.getElementById("estadoApi");
 const map = L.map("mapa").setView([0, 0], 2);
@@ -109,6 +109,45 @@ function calcularEscala(datos) {
     };
 }
 
+function seleccionarTramoOrbital(datos) {
+    const tamano = Math.min(120, datos.length);
+    let indiceMaximo = 0;
+
+    datos.forEach((punto, index) => {
+        if (punto.error_sgp4_km > datos[indiceMaximo].error_sgp4_km) {
+            indiceMaximo = index;
+        }
+    });
+
+    const inicio = Math.max(0, Math.min(indiceMaximo - Math.floor(tamano / 2), datos.length - tamano));
+    return datos.slice(inicio, inicio + tamano);
+}
+
+function calcularFactorAmpliacion(datos) {
+    const xs = datos.map((punto) => punto.oem_x_km);
+    const ys = datos.map((punto) => punto.oem_y_km);
+    const rangoX = Math.max(...xs) - Math.min(...xs);
+    const rangoY = Math.max(...ys) - Math.min(...ys);
+    const rangoTramo = Math.sqrt(rangoX ** 2 + rangoY ** 2);
+
+    const maxDiferencia = Math.max(
+        ...datos.map((punto) => Math.hypot(punto.sgp4_x_km - punto.oem_x_km, punto.sgp4_y_km - punto.oem_y_km)),
+        ...datos.map((punto) => Math.hypot(punto.ia_x_km - punto.oem_x_km, punto.ia_y_km - punto.oem_y_km))
+    );
+
+    return Math.min(70, Math.max(12, (rangoTramo * 0.10) / (maxDiferencia || 1)));
+}
+
+function ampliarSeparacion(datos, factor) {
+    return datos.map((punto) => ({
+        ...punto,
+        sgp4_x_km: punto.oem_x_km + (punto.sgp4_x_km - punto.oem_x_km) * factor,
+        sgp4_y_km: punto.oem_y_km + (punto.sgp4_y_km - punto.oem_y_km) * factor,
+        ia_x_km: punto.oem_x_km + (punto.ia_x_km - punto.oem_x_km) * factor,
+        ia_y_km: punto.oem_y_km + (punto.ia_y_km - punto.oem_y_km) * factor
+    }));
+}
+
 function escalarPuntos(datos, prefijo, escala, ancho, alto, margen) {
     return datos.map((punto) => {
         const x = punto[`${prefijo}_x_km`];
@@ -121,15 +160,16 @@ function escalarPuntos(datos, prefijo, escala, ancho, alto, margen) {
     });
 }
 
-function trazarLinea(ctx, puntos, color, discontinua = false) {
+function trazarLinea(ctx, puntos, color, discontinua = false, anchoLinea = 2.2, opacidad = 1) {
     if (puntos.length === 0) {
         return;
     }
 
     ctx.save();
+    ctx.globalAlpha = opacidad;
     ctx.beginPath();
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2.2;
+    ctx.lineWidth = anchoLinea;
     ctx.setLineDash(discontinua ? [7, 5] : []);
     ctx.moveTo(puntos[0].x, puntos[0].y);
 
@@ -138,6 +178,21 @@ function trazarLinea(ctx, puntos, color, discontinua = false) {
     });
 
     ctx.stroke();
+    ctx.restore();
+}
+
+function dibujarPuntos(ctx, puntos, color) {
+    ctx.save();
+    ctx.fillStyle = color;
+    puntos.forEach((punto, index) => {
+        if (index % 10 !== 0) {
+            return;
+        }
+
+        ctx.beginPath();
+        ctx.arc(punto.x, punto.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+    });
     ctx.restore();
 }
 
@@ -167,10 +222,22 @@ function dibujarComparacionOrbital(datos) {
         ctx.stroke();
     }
 
-    const escala = calcularEscala(datos);
-    trazarLinea(ctx, escalarPuntos(datos, "oem", escala, ancho, alto, margen), "#2266cc");
-    trazarLinea(ctx, escalarPuntos(datos, "sgp4", escala, ancho, alto, margen), "#d94848", true);
-    trazarLinea(ctx, escalarPuntos(datos, "ia", escala, ancho, alto, margen), "#2f9e73");
+    const tramo = seleccionarTramoOrbital(datos);
+    const factor = calcularFactorAmpliacion(tramo);
+    const datosAmpliados = ampliarSeparacion(tramo, factor);
+    const escala = calcularEscala(datosAmpliados);
+    const puntosOem = escalarPuntos(datosAmpliados, "oem", escala, ancho, alto, margen);
+    const puntosSgp4 = escalarPuntos(datosAmpliados, "sgp4", escala, ancho, alto, margen);
+    const puntosIa = escalarPuntos(datosAmpliados, "ia", escala, ancho, alto, margen);
+
+    trazarLinea(ctx, puntosOem, "#2266cc", false, 3, 0.65);
+    trazarLinea(ctx, puntosSgp4, "#d94848", true, 2.4, 0.95);
+    trazarLinea(ctx, puntosIa, "#2f9e73", false, 2.6, 0.95);
+    dibujarPuntos(ctx, puntosOem, "#2266cc");
+
+    ctx.fillStyle = "#465463";
+    ctx.font = "13px Segoe UI, Arial";
+    ctx.fillText(`Separación visual ampliada x${factor.toFixed(0)}`, margen + 8, alto - 10);
 }
 
 function dibujarGraficaError(datos) {
