@@ -41,7 +41,7 @@ def _distancia_3d(df: pd.DataFrame, columnas: list[str]) -> pd.Series:
 
 def preparar_variables(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    df["fecha_hora"] = pd.to_datetime(df["fecha_hora"], utc=True)
+    df["fecha_hora"] = pd.to_datetime(df["fecha_hora"], utc=True, format="mixed")
     df["tiempo_min"] = (df["fecha_hora"] - df["fecha_hora"].min()).dt.total_seconds() / 60
 
     # Meto seno y coseno para que la IA vea que la orbita se repite cada vuelta.
