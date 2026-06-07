@@ -123,6 +123,36 @@ def propagar_sgp4(timestamps: pd.Series, satelite: EarthSatellite) -> pd.DataFra
     return pd.DataFrame(posiciones)
 
 
+def filtrar_oem_cerca_del_tle(
+    oem: pd.DataFrame,
+    satelite: EarthSatellite,
+    dias_margen: int = 1,
+    minimo_vectores: int = 30,
+    maximo_vectores: int = 360,
+) -> pd.DataFrame:
+    epoca_tle = pd.Timestamp(satelite.epoch.utc_datetime())
+    inicio = epoca_tle - pd.Timedelta(days=dias_margen)
+    fin = epoca_tle + pd.Timedelta(days=dias_margen)
+
+    filtrado = oem[(oem["fecha_hora"] >= inicio) & (oem["fecha_hora"] <= fin)].copy()
+
+    if len(filtrado) < minimo_vectores:
+        oem = oem.copy()
+        oem["distancia_tle_min"] = (
+            oem["fecha_hora"] - epoca_tle
+        ).abs().dt.total_seconds() / 60
+        filtrado = (
+            oem.sort_values("distancia_tle_min")
+            .head(maximo_vectores)
+            .sort_values("fecha_hora")
+            .drop(columns=["distancia_tle_min"])
+        )
+
+    print(f"Epoca del TLE: {epoca_tle}")
+    print(f"Vectores OEM usados tras filtrar: {len(filtrado)}")
+    return filtrado.reset_index(drop=True)
+
+
 def comparar_sgp4_oem(
     ruta_oem: Path = RUTA_OEM,
     ruta_tle: Path = RUTA_TLE,
@@ -130,6 +160,7 @@ def comparar_sgp4_oem(
 ) -> pd.DataFrame:
     oem = cargar_oem(ruta_oem)
     satelite = cargar_satelite_desde_tle(ruta_tle)
+    oem = filtrar_oem_cerca_del_tle(oem, satelite)
     sgp4 = propagar_sgp4(oem["fecha_hora"], satelite)
 
     df = pd.concat([oem, sgp4], axis=1)
