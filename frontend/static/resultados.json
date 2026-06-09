@@ -1,0 +1,18 @@
+{
+  "temporal": {
+    "titulo": "Prediccion de tramo futuro",
+    "descripcion": "Entrena con el primer 75% y prueba con datos posteriores.",
+    "error_sgp4_km": 10.634,
+    "error_ia_km": 1.98,
+    "mejora_porcentaje": 81.38,
+    "muestras": 180
+  },
+  "calibracion": {
+    "titulo": "Calibracion con datos NASA OEM",
+    "descripcion": "Entrena y prueba con puntos intercalados dentro de la ventana OEM.",
+    "error_sgp4_km": 7.875,
+    "error_ia_km": 0.398,
+    "mejora_porcentaje": 94.94,
+    "muestras": 180
+  }
+}

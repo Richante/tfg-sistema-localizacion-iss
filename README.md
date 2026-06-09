@@ -8,7 +8,9 @@ El proyecto calcula una trayectoria estimada de la ISS con TLE + SGP4, la
 compara con la efemeride oficial NASA OEM y entrena un modelo de IA para aprender
 el residuo entre ambas trayectorias.
 
-## Demo desplegada
+## Demos desplegadas
+
+### Demo dinamica en AWS
 
 Frontend desplegado en AWS S3:
 
@@ -25,6 +27,26 @@ http://3.81.172.135/api/estado
 > Nota: el despliegue se ha realizado en AWS Academy Learner Lab. Si se reinicia
 > el laboratorio, la IP publica de EC2 puede cambiar. En ese caso, el frontend
 > permite indicar la nueva API con el parametro `?api=http://NUEVA_IP_PUBLICA`.
+
+### Demo estatica sin backend
+
+Como alternativa estable para el periodo de evaluacion, el repositorio incluye
+una demo estatica con resultados ya generados. Esta version no necesita EC2 ni
+API Flask activa, por lo que puede publicarse en GitHub Pages o en un bucket S3
+estatico y seguir funcionando aunque el laboratorio de AWS Academy este apagado.
+
+La carpeta preparada para GitHub Pages es:
+
+```text
+docs/
+```
+
+Cuando GitHub Pages este activado sobre la carpeta `docs/` de la rama `main`, la
+demo estatica estara disponible en:
+
+```text
+https://richante.github.io/tfg-sistema-localizacion-iss/
+```
 
 ## Idea tecnica
 
@@ -104,6 +126,15 @@ python scripts/generar_dataset_24h.py
 python scripts/exportar_web.py
 ```
 
+Para regenerar la demo estatica usada por GitHub Pages:
+
+```bash
+python scripts/exportar_demo_estatica.py
+```
+
+Este comando crea los JSON en `frontend/static/` y copia el frontend completo a
+`docs/`, manteniendo la documentacion existente.
+
 ## Backend local
 
 El backend lee los CSV/JSON generados y expone la informacion al frontend:
@@ -132,6 +163,14 @@ frontend/index.html?api=http://IP_BACKEND
 
 En AWS, los archivos `index.html`, `style.css` y `app.js` se publican en un
 bucket S3 configurado como sitio web estatico.
+
+Si se abre sin el parametro `api`, el frontend usa automaticamente los archivos
+estaticos de `static/`:
+
+```text
+frontend/index.html
+docs/index.html
+```
 
 ## Validacion y resultados
 

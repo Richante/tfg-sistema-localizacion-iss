@@ -1,0 +1,10 @@
+{
+  "servicio": "Demo estatica ISS IA",
+  "estado": "ok",
+  "modo": "estatico",
+  "endpoints": [
+    "static/trayectoria.json",
+    "static/resultados.json",
+    "static/trayectorias-comparadas.json"
+  ]
+}
