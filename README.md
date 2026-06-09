@@ -1,51 +1,166 @@
 # tfg-sistema-localizacion-iss
-Repositorio para el Trabajo de Fin de Grado: Sistema de localización de la Estación Espacial Internacional. Documentación, scripts, resultados y recursos.
 
-### Objetivo del TFG: Corrección del Error Predictivo Orbital (NASA vs IA)
+Repositorio del Trabajo de Fin de Grado: **Sistema inteligente de localizacion
+y validacion orbital de la Estacion Espacial Internacional mediante SGP4, datos
+NASA OEM e inteligencia artificial**.
+
+El proyecto calcula una trayectoria estimada de la ISS con TLE + SGP4, la
+compara con la efemeride oficial NASA OEM y entrena un modelo de IA para aprender
+el residuo entre ambas trayectorias.
+
+## Demo desplegada
+
+Frontend desplegado en AWS S3:
+
+```text
+http://tfg-iss-ia-richante-812206147937-us-east-1-an.s3-website-us-east-1.amazonaws.com/?api=http://3.81.172.135
+```
+
+Backend Flask desplegado en AWS EC2:
+
+```text
+http://3.81.172.135/api/estado
+```
+
+> Nota: el despliegue se ha realizado en AWS Academy Learner Lab. Si se reinicia
+> el laboratorio, la IP publica de EC2 puede cambiar. En ese caso, el frontend
+> permite indicar la nueva API con el parametro `?api=http://NUEVA_IP_PUBLICA`.
+
+## Idea tecnica
+
+La IA no sustituye al modelo orbital SGP4. El sistema usa SGP4 como base fisica
+y entrena un modelo de aprendizaje automatico para corregir el residuo frente a
+la referencia NASA OEM:
+
+```text
+residuo = posicion_NASA_OEM - posicion_SGP4
+posicion_corregida = posicion_SGP4 + residuo_predicho_por_IA
+```
+
+Flujo general:
 
 ```mermaid
 graph TD
-    A[ NASA - Datos Brutos TLE ]:::nasa
+    A[CelesTrak TLE ISS] --> B[SGP4 / Skyfield]
+    B --> C[Posicion estimada SGP4]
 
-    subgraph MODELO_TRADICIONAL
-        B( Algoritmo SGP4 ):::proceso
-        C[( Prediccion Teorica NASA )]:::datos
-    end
+    D[NASA Spot the Station OEM] --> E[Referencia NASA OEM]
 
-    subgraph MI_SISTEMA_INTELIGENTE
-        D[ Red Neuronal / IA ]:::ia
-        E[( Prediccion Corregida por IA )]:::datos
-    end
-
-    F{ ¿Cual se acerca mas a la realidad? }:::valor
-
-    A --> B
-    B --> C
-    
-    A --> D
-    C -.->|Se usa como base| D
-    D --> E
-
-    C --> F
+    C --> F[Comparacion temporal coherente]
     E --> F
+    F --> G[Residuo OEM - SGP4]
+    G --> H[RandomForestRegressor]
+    H --> I[SGP4 + IA]
 
-    classDef nasa fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px;
-    classDef proceso fill:#fff2cc,stroke:#d6b656,stroke-width:2px;
-    classDef datos fill:#f5f5f5,stroke:#666666,stroke-width:2px;
-    classDef ia fill:#e1d5e7,stroke:#9673a6,stroke-width:2px;
-    classDef valor fill:#d5e8d4,stroke:#82b366,stroke-width:4px;
+    C --> J[API Flask]
+    I --> J
+    J --> K[Frontend S3]
 ```
 
-## Validacion SGP4 vs IA
+## Fuentes de datos
 
-La fase nueva del proyecto compara una prediccion SGP4 basada en TLE contra la
-efemeride OEM oficial de NASA Spot the Station. La IA se usa como corrector del
-residuo entre ambas trayectorias.
+- **NASA Spot the Station / ISS Trajectory Data**: fuente oficial de la
+  efemeride NASA OEM usada como referencia externa.
+- **CelesTrak**: fuente publica especializada para obtener el TLE actualizado de
+  la ISS, necesario para propagar la orbita con SGP4.
+- **Datos generados por el sistema**: CSV/JSON producidos por los scripts de
+  comparacion, entrenamiento y visualizacion.
 
-Flujo principal:
+## Estructura del repositorio
+
+```text
+app.py                         Backend Flask con endpoints JSON
+frontend/                      Interfaz web estatica HTML/CSS/JS
+scripts/                       Descarga, comparacion, entrenamiento y exportacion
+data/                          Datos TLE, OEM y datasets generados
+results/                       Resultados de evaluacion y graficas
+models/                        Modelo entrenado en formato joblib
+docs/                          Documentacion tecnica del proyecto
+tests/                         Pruebas automatizadas
+```
+
+## Ejecucion principal
+
+Desde la raiz del repositorio:
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 python scripts/ejecutar_validacion_oem.py
 ```
 
-Documentacion: `docs/validacion_sgp4_vs_ia.md`
+El flujo descarga el TLE actual, descarga el OEM de NASA, filtra el OEM a una
+ventana temporal cercana a la epoca del TLE, compara SGP4 contra NASA OEM y
+entrena el corrector IA.
+
+## Preparar datos del frontend
+
+Para regenerar el JSON de trayectoria usado por el mapa:
+
+```bash
+cp data/iss_tle_actual.txt data/iss_tle.txt
+python scripts/generar_dataset_24h.py
+python scripts/exportar_web.py
+```
+
+## Backend local
+
+El backend lee los CSV/JSON generados y expone la informacion al frontend:
+
+```bash
+sudo .venv/bin/python app.py
+```
+
+Endpoints principales:
+
+```text
+/api/estado
+/api/trayectoria
+/api/resultados
+/api/trayectorias-comparadas
+```
+
+## Frontend local o S3
+
+El frontend esta en la carpeta `frontend/`. Puede abrirse como sitio estatico y
+apuntar al backend mediante el parametro `api`:
+
+```text
+frontend/index.html?api=http://IP_BACKEND
+```
+
+En AWS, los archivos `index.html`, `style.css` y `app.js` se publican en un
+bucket S3 configurado como sitio web estatico.
+
+## Validacion y resultados
+
+La validacion compara dos escenarios:
+
+- **Prediccion futura corta**: entrena con la primera parte de la ventana
+  temporal y prueba con un tramo posterior cercano.
+- **Calibracion con NASA OEM**: entrena con puntos intercalados de la ventana
+  OEM y prueba con otros puntos cercanos no usados directamente para entrenar.
+
+La salida principal se genera en:
+
+```text
+data/comparacion_sgp4_oem.csv
+results/evaluacion_corrector_ia_temporal.csv
+results/evaluacion_corrector_ia_calibracion.csv
+models/modelo_corrector_sgp4_oem.joblib
+```
+
+## Pruebas
+
+```bash
+python -m pytest -q
+```
+
+## Documentacion
+
+La explicacion detallada de la validacion SGP4 vs IA se encuentra en:
+
+```text
+docs/validacion_sgp4_vs_ia.md
+```
